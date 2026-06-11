@@ -1,10 +1,9 @@
 services:
   # 1. Frontend Static Site
-  - type: web
+  - type: static
     name: roadwatch-frontend
-    env: static
     buildCommand: npm run build
-    publishPath: dist
+    staticPublishPath: dist
     baseDir: roadwatch-main/frontend
     envVars:
       - key: VITE_API_URL
@@ -16,7 +15,7 @@ services:
   # 2. Backend Express API
   - type: web
     name: roadwatch-backend
-    env: node
+    runtime: node
     buildCommand: npm install --legacy-peer-deps
     startCommand: node server.js
     baseDir: roadwatch-main/backend
@@ -33,7 +32,7 @@ services:
   # 3. ML Intelligence Service (FastAPI)
   - type: web
     name: roadwatch-ml-service
-    env: python
+    runtime: python
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port 8000
     baseDir: roadwatch-main/ml-service
