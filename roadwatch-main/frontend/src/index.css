@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@400;600;700;800&display=swap');
+@import "tailwindcss";
+@config "../tailwind.config.js";
+
+@layer base {
+  body {
+    @apply bg-slate-900 text-slate-50 antialiased font-sans;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-bold text-slate-100 tracking-tight;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-orange-600 hover:bg-orange-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg shadow-orange-600/30 transition-all active:scale-95;
+  }
+  .btn-secondary {
+    @apply bg-slate-800 border border-slate-700 hover:bg-slate-700 text-white font-semibold py-3 px-6 rounded-lg transition-all active:scale-95;
+  }
+  .glass-card {
+    @apply bg-slate-800/60 backdrop-blur-md border border-slate-700 shadow-xl rounded-2xl;
+  }
+}
+
+/* Custom Scrollbar for dark theme */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-slate-900;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-700 rounded-full;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-600;
+}
