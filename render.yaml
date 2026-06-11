@@ -1,10 +1,11 @@
 services:
   # 1. Frontend Static Site
-  - type: static
+  - type: web
     name: roadwatch-frontend
+    runtime: static
     buildCommand: npm run build
     staticPublishPath: dist
-    baseDir: roadwatch-main/frontend
+    rootDir: roadwatch-main/frontend
     envVars:
       - key: VITE_API_URL
         fromService:
@@ -18,7 +19,7 @@ services:
     runtime: node
     buildCommand: npm install --legacy-peer-deps
     startCommand: node server.js
-    baseDir: roadwatch-main/backend
+    rootDir: roadwatch-main/backend
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -35,7 +36,7 @@ services:
     runtime: python
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port 8000
-    baseDir: roadwatch-main/ml-service
+    rootDir: roadwatch-main/ml-service
     envVars:
       - key: PORT
         value: 8000
