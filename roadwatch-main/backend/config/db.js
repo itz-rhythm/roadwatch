@@ -2,13 +2,17 @@ const { Pool } = require('pg');
 const dotenv = require('dotenv');
 dotenv.config();
 
-const pool = new Pool({
-  user: process.env.POSTGRES_USER || 'postgres',
-  host: process.env.POSTGRES_HOST || 'localhost',
-  database: process.env.POSTGRES_DB || 'roadwatch',
-  password: process.env.POSTGRES_PASSWORD || 'password',
-  port: process.env.POSTGRES_PORT || 5432,
-});
+const pool = new Pool(
+  process.env.DATABASE_URL
+    ? { connectionString: process.env.DATABASE_URL }
+    : {
+        user: process.env.POSTGRES_USER || 'postgres',
+        host: process.env.POSTGRES_HOST || 'localhost',
+        database: process.env.POSTGRES_DB || 'roadwatch',
+        password: process.env.POSTGRES_PASSWORD || 'password',
+        port: process.env.POSTGRES_PORT || 5432,
+      }
+);
 
 // Suppress unhandled pool errors when postgres is offline
 pool.on('error', (err) => {
