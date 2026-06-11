@@ -45,5 +45,4 @@ databases:
   # Managed PostgreSQL Database
   - name: roadwatch-db
     databaseName: roadwatch
-    user: postgres
     plan: free
