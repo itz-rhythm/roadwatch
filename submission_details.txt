@@ -1,0 +1,132 @@
+================================================================================
+                        ROADWATCH - SUBMISSION DETAILS
+================================================================================
+
+1. PROJECT OVERVIEW
+--------------------------------------------------------------------------------
+RoadWatch is a web-based public accountability and monitoring platform designed 
+to track public road infrastructure health. The application aims to solve the 
+issue of delayed road repairs, lack of contractor transparency, and bureaucratic 
+delays in municipal road maintenance. 
+
+Through RoadWatch, citizens can file geo-located complaints about potholes, 
+waterlogging, and other hazards, while municipal authorities can assign tasks 
+directly to registered contractors. The platform uses a data-driven approach, 
+ranking contractors based on their historic project failure frequency and citizen 
+feedback, and utilizes machine learning for severity classification, duplicate 
+detection, and predictive maintenance scheduling.
+
+
+2. SYSTEM ARCHITECTURE & COMPONENTS
+--------------------------------------------------------------------------------
+The project is built as a multi-service decoupled application:
+
+- Frontend: A responsive Single Page Application (SPA) built using React and 
+  Vite. It features interactive spatial map visualization using Leaflet for 
+  heatmap analysis, Tailwind CSS for premium responsive UI styling, and Recharts 
+  for municipal analytics dashboards.
+  
+- Backend API: A Node.js and Express server that handles core business logic, 
+  user authentication, route planning, real-time updates via Socket.io, PDF 
+  generation (for Right to Information documents), and cron jobs for auto-escalating 
+  SLA breaches.
+
+- ML Service: A FastAPI (Python) service that handles computationally heavy 
+  tasks such as comparing CLIP image embeddings for duplicate check requests, 
+  simulated Random Forest inference for road failure predictions, and YOLOv8 
+  video frame analysis for automated dashcam issue drafting.
+
+- Database: PostgreSQL with the PostGIS extension, allowing advanced geospatial 
+  queries (e.g., finding nearby complaints, calculating road damage length, 
+  and checking ward boundaries).
+
+
+3. SOFTWARE PACKAGES & DEPENDENCIES USED
+--------------------------------------------------------------------------------
+
+A. FRONTEND (React & Vite SPA)
+------------------------------
+- React (v19.2.6) & React DOM (v19.2.6): Core UI library.
+- React Router DOM (v7.16.0): Handles client-side page routing.
+- Axios (v1.17.0): Handles HTTP requests to the backend API.
+- Leaflet (v1.9.4): Enables interactive map visualization.
+- Mapbox GL (v3.24.0): Used for advanced map rendering layers.
+- Recharts (v3.8.1): Renders data-driven SVG charts in the dashboard.
+- Lucide React (v1.17.0): Vector icon library for UI consistency.
+- @tanstack/react-query (v5.100.14): Efficient asynchronous server-state caching.
+- i18next & React i18next: Multi-language support (English, Hindi, Gujarati).
+- IDB (v8.0.3): IndexedDB helper for offline-first local state storage.
+- Tailwind CSS & Autoprefixer: Utility-first CSS framework for modern styling.
+- Vite (v8.0.12): Modern build tool and development server.
+
+B. BACKEND (Node.js & Express API)
+----------------------------------
+- Express (v5.2.1): Web framework for routing and middleware.
+- PG & PG-Hstore (v8.21.0): PostgreSQL client for executing spatial queries.
+- Cloudinary & Multer-Storage-Cloudinary: File storage integration for uploaded 
+  complaint photos.
+- Multer (v2.1.1): Handles multipart form data for file uploads.
+- JWT (JsonWebToken v9.0.3): Implements secure stateless session tokens.
+- BcryptJS (v3.0.3): Handles password hashing and verification.
+- Socket.io (v4.8.3): WebSockets for real-time notifications.
+- PDFKit (v0.18.0): Programmatically generates official RTI PDF documents.
+- Node Cron (v4.2.1): Schedules periodic task checks (e.g., hourly SLA breaches).
+- Dotenv (v17.4.2): Loads environment configurations locally.
+- CORS (v2.8.6): Enables cross-origin resource sharing for the frontend client.
+
+C. ML SERVICE (Python & FastAPI)
+--------------------------------
+- FastAPI (v0.136.3) & Uvicorn (v0.48.0): High-performance ASGI web server.
+- PyDantic (v2.13.4): Data validation and settings management.
+- Torch, Torchvision, & Torchaudio: Deep learning framework used for loading 
+  image embeddings and video classification models.
+- Pillow (v12.2.0): Image processing library.
+- Scikit-Learn (v1.8.0) & SciPy: Machine learning algorithms (e.g. Random Forest).
+- NumPy (v2.4.6) & SymPy: Numerical calculations and vector similarity operations.
+- Requests (v2.34.2) & urllib3: Network calls.
+- OpenAI Whisper & Tiktoken: Audio transcription libraries for voice reports.
+
+
+4. KEY ASSUMPTIONS & DESIGN DECISIONS
+--------------------------------------------------------------------------------
+
+- In-Memory Database Fallback:
+  To make local testing and demonstrations friction-free, the backend is 
+  designed with a PostgreSQL database detection check. If a connection to 
+  Postgres fails (e.g., if database setup is pending), the backend automatically 
+  falls back to an in-memory database mock store (`MEMORY_DB`). This ensures the 
+  app is functional immediately upon running locally.
+
+- User Roles & Access Control:
+  The system assumes five distinct user roles with specific privileges:
+  * Citizen: Can report issues, upvote active complaints, and download RTIs.
+  * Volunteer: Can verify nearby citizen complaints to reduce spam.
+  * Ward Authority: Can view dashboards, assign contractors, and flag delays.
+  * City Engineer: Can review budgets and contractor stats at the city level.
+  * Admin: Full system control, including blacklist overrides.
+
+- SLA & Auto-Escalation Logic:
+  Service Level Agreements (SLAs) are automatically calculated during complaint 
+  submission based on severity:
+  * Critical: 24-hour resolution deadline.
+  * Dangerous: 48-hour resolution deadline.
+  * Moderate: 7-day resolution deadline.
+  * Minor: 30-day resolution deadline.
+  If a contractor misses this deadline, the backend cron job automatically 
+  initiates an escalation flow, increasing the priority level and notifying the 
+  zone/city engineer.
+
+- Image Duplicate Detection (CLIP):
+  To prevent citizens from submitting duplicate reports for the same pothole or 
+  road failure, the platform assumes that issues within a 100-meter radius 
+  require a visual similarity check. A CLIP model generates 512-dimension vector 
+  embeddings of the photos, and a Cosine Similarity score above 0.85 indicates a 
+  duplicate submission.
+
+- Mock vs. Production ML Inference:
+  For lightweight local deployment, complex operations (such as loading the 
+  YOLOv8 weight files for dashcam parsing or running heavy neural network feeds) 
+  are stubbed with structured mock responses. This mirrors production API 
+  payload formats without requiring high-end GPU hardware to run the project locally.
+
+================================================================================
